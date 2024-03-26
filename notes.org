@@ -1,0 +1,42 @@
+* Things to do
+
+** DONE Make sure that both pis can talk to both of the radio trancievers
+
+- [X] inuti23
+  - [X] bus 0
+  - [X] bus 1
+- [X] inuti40
+  - [X] bus 0
+  - [X] bus 1
+
+** TODO Make a decision about what libraries to use
+
+*** DONE Try the Go library again.
+CLOSED: [2024-03-26 Tue 14:31]
+When we tried this at first, we used incorrect pins.
+
+After trying it again, there seems to be issues with the library (it tries to
+wrap a Go pointer as a C pointer and panics).
+
+*** DONE Try the Python libraries again
+CLOSED: [2024-03-26 Tue 14:47]
+They did not work.
+
+*** TODO Investigate the C/C++ example we got to work earlier
+
+
+* Diary
+
+** 2024-03-26
+We had trouble getting any of the python examples of of Canvas to work.
+
+Eventually we got [[https://nrf24.github.io/RF24/md_docs_linux_install.html][the C++ example in the nrf24 documentation]] to communicate with
+the transciever on the =inuti23= pi, but only on bus 1.  To do so, we needed to
+set the ~CE_PIN~ to 27 and the ~CSN_PIN~ to 10 (decimal).
+
+After testing the same code on the =inuti40= pi, bus 0 (~CE_PIN~ = 17 and ~CSN_PIN~ =
+0) also worked.  This indicates that something is wrong with the ~inuti23~ pi.
+
+After a reboot, both busses worked on the inuti23 pi as well :).
+
+We also tried some Go and Python libraries, neither of which worked.
