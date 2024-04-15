@@ -54,3 +54,6 @@ approach to start.
 We should try to get solid communication between the pis next.  This means base
 station recieving the mobile unit's communincation without recieving it
 themselves, and vice versa.
+
+We tried to rewrite the C/C++ example from nrf24 with the rf24c wrapper.  It
+works we think.  We haven't tested it on the actual hardware yet...
