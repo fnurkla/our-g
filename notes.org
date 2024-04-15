@@ -40,3 +40,17 @@ After testing the same code on the =inuti40= pi, bus 0 (~CE_PIN~ = 17 and ~CSN_P
 After a reboot, both busses worked on the inuti23 pi as well :).
 
 We also tried some Go and Python libraries, neither of which worked.
+
+** 2024-04-15
+We should take the rf24c from the rf24-go repo and use as the interface between
+C and the C++ library.
+
+We can use POSIX threads, separate for the Rx and the Tx side.  They will likely
+need a way to communicate.  How?
+
+IP packets can cleanly be split into 32 bit lines.  We can try this simple
+approach to start.
+
+We should try to get solid communication between the pis next.  This means base
+station recieving the mobile unit's communincation without recieving it
+themselves, and vice versa.
