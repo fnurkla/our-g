@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.9)
 
 project(rf24c VERSION 1.0.0 DESCRIPTION "C wrapper for RF24.")
 
-IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  SET(CMAKE_INSTALL_PREFIX /usr CACHE PATH "" FORCE)
-ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#  SET(CMAKE_INSTALL_PREFIX /usr CACHE PATH "" FORCE)
+#ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 # detect the CPU make and type
 include(./cmake/detectCPU.cmake) # sets the variable SOC accordingly
@@ -30,7 +30,7 @@ target_compile_definitions(rf24c PRIVATE RF24_NO_INTERRUPT)
 set_target_properties(rf24c PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(rf24c PROPERTIES PUBLIC_HEADER rf24c.h)
 
-target_include_directories(rf24c PRIVATE . /usr/include/RF24)
+target_include_directories(rf24c PRIVATE . /usr/local/include/RF24)
 
 include(GNUInstallDirs)
 
