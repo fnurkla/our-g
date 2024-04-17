@@ -20,13 +20,7 @@
 // CS Pin addresses the SPI bus number at /dev/spidev<a>.<b>
 // ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
 #define CSN_PIN 0
-#ifdef MRAA
-    #define CE_PIN 15 // GPIO22
-#elif defined(RF24_WIRINGPI)
-    #define CE_PIN 3 // GPIO22
-#else
-    #define CE_PIN 22
-#endif
+#define CE_PIN 17 // GPIO22
 // Generic:
 RF24Handle radio;
 /****************** Linux (BBB,x86,etc) ***********************/
