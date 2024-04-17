@@ -60,6 +60,7 @@ DLL void rf24_setCRCLength(RF24Handle rf_handle, rf24_crclength_val length);
 DLL rf24_crclength_val rf24_getCRCLength(RF24Handle rf_handle);
 DLL void rf24_disableCRC(RF24Handle rf_handle);
 DLL void rf24_printDetails(RF24Handle rf_handle);
+DLL void rf24_printPrettyDetails(RF24Handle rf_handle);
 // TODO: string rf24_getDetails()?
 DLL void rf24_powerDown(RF24Handle rf_handle);
 DLL void rf24_powerUp(RF24Handle rf_handle);

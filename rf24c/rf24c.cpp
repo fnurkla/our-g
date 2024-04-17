@@ -175,6 +175,11 @@ void rf24_printDetails(RF24Handle rf_handle) {
   r->printDetails();
 }
 
+void rf24_printPrettyDetails(RF24Handle rf_handle) {
+  RF24* r = to_rf(rf_handle);
+  r->printPrettyDetails();
+}
+
 // TODO: string rf24_getDetails()?
 void rf24_powerDown(RF24Handle rf_handle) {
   RF24* r = to_rf(rf_handle);

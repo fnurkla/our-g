@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 
     // For debugging info
     // rf24_printDetails(radio);       // (smaller) function that prints raw register values
-    // rf24_printPrettyDetails(radio); // (larger) function that prints human readable data
+    rf24_printPrettyDetails(radio); // (larger) function that prints human readable data
 
     // ready to execute program now
     set_role(); // calls master() or slave() based on user input
