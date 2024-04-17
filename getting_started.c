@@ -13,7 +13,6 @@
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
 #include <rf24c.h> // RF24, RF24_PA_LOW, delay()
 
-#define RF24_PA_LOW 1
 /****************** Linux ***********************/
 // Radio CE Pin, CSN Pin, SPI Speed
 // CE Pin uses GPIO number with BCM and SPIDEV drivers, other platforms use their own pin numbering
@@ -21,6 +20,8 @@
 // ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
 #define CSN_PIN 0
 #define CE_PIN 17 // GPIO22
+
+#define CHANNEL 111
 // Generic:
 RF24Handle radio;
 /****************** Linux (BBB,x86,etc) ***********************/
@@ -51,6 +52,8 @@ int main(int argc, char** argv)
     /*   return 0; // quit now */
     /* } */
     rf24_begin(radio);
+
+    rf24_setChannel(radio, CHANNEL);
 
     // to use different addresses on a pair of radios, we need a variable to
     // uniquely identify which address this radio will use to transmit
