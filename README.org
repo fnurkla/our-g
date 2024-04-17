@@ -57,3 +57,5 @@ themselves, and vice versa.
 
 We tried to rewrite the C/C++ example from nrf24 with the rf24c wrapper.  It
 works we think.  We haven't tested it on the actual hardware yet...
+
+** 2024-04-17
