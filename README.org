@@ -22,8 +22,27 @@ wrap a Go pointer as a C pointer and panics).
 CLOSED: [2024-03-26 Tue 14:47]
 They did not work.
 
-*** TODO Investigate the C/C++ example we got to work earlier
+*** DONE Investigate the C/C++ example we got to work earlier
+CLOSED: [2024-04-17 Wed 15:08]
+We seem to be making progress with this.  We install the =RF24= library through
+the provided =install.sh=.  This puts them in =/usr/local/{include|lib}=.
 
+The c-wrapper files are placed in the same directories.
+
+*** TODO Redo build system
+
+*** DONE Check radio frequencies
+CLOSED: [2024-04-17 Wed 16:01]
+We have switched to channel 111.
+
+*** DONE Check radio powers
+CLOSED: [2024-04-17 Wed 16:02]
+We can now change it easily.  This turned out to not be the problem, so we stay
+at low power; for testing at least.
+
+*** TODO Research NAT and routing
+
+*** TODO Research control plane
 
 * Diary
 
@@ -59,3 +78,39 @@ We tried to rewrite the C/C++ example from nrf24 with the rf24c wrapper.  It
 works we think.  We haven't tested it on the actual hardware yet...
 
 ** 2024-04-17
+We had build troubles with the C wrapper and the RF24 library.  We solved them.
+
+From yesterdays lecture we determined that we want to run the uplink and
+downlink at different frequencies so that we do not interfere with ourselves.
+This might also be our problem with communicating between the pis? That they're
+running on different frequencies that is.
+
+*** The plan
+
+On both sides we need a sender and a reciever process/thread.
+
+The sender process will
+- Read from the Virtual interface
+- Fragment the packages
+- Send the fragments over the radio
+
+The reciever process will
+- Listen to the radio
+- Defragment the packages
+- Write to the virtual interface
+
+*** NAT
+NAT will be needed so that the base station knows where packages are to be sent.
+How to do that will need to be investigated.
+
+*** Goal UX
+On the base station
+#+begin_src bash
+./base_station
+#+end_src
+This would maybe then set up all the routing stuff as well.
+
+On the mobile unit
+#+begin_src bash
+./mobile_unit
+#+end_src
