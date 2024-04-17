@@ -137,7 +137,7 @@ void master()
         }
 
         // to make this example readable in the terminal
-        sleep(1000); // slow transmissions down by 1 second
+        sleep(1); // slow transmissions down by 1 second
     }
     printf("%d failures detected. Leaving TX role.\n", failure);
 }
