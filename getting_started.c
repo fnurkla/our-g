@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
-    rf24_setPALevel(radio, RF24_PA_LOW); // RF24_PA_MAX is default.
+    rf24_setPALevel(radio, RF24_PA_MAX); // RF24_PA_MAX is default.
 
     // set the TX address of the RX node into the TX pipe
     rf24_openWritingPipe(radio, address[radio_number]); // always uses pipe 0

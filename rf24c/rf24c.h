@@ -22,6 +22,12 @@ typedef uint8_t rf24_pa_dbm_val;
 typedef uint8_t rf24_datarate_val;
 typedef uint8_t rf24_crclength_val;
 
+#define RF24_PA_MIN 0
+#define RF24_PA_LOW 1
+#define RF24_PA_HIGH 2
+#define RF24_PA_MAX 3
+#define RF24_PA_ERROR 4
+
 #ifdef __cplusplus
 #define DLL extern "C"
 #else
