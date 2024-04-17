@@ -14,7 +14,7 @@
 #define crc_to_e(val) (static_cast<rf24_crclength_e>(val))
 #define dat_to_e(val) (static_cast<rf24_datarate_e>(val))
 
-RF24Handle new_rf24(uint16_t ce, uint16_t csn) {
+RF24Handle new_rf24(rf24_gpio_pin_t ce, rf24_gpio_pin_t csn) {
   RF24* r = new RF24(ce, csn);
   return to_rfh(r);
 }

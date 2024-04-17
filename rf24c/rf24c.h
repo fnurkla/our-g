@@ -28,7 +28,7 @@ typedef uint8_t rf24_crclength_val;
 #define DLL
 #endif
 
-DLL RF24Handle new_rf24(uint16_t ce, uint16_t csn);
+DLL RF24Handle new_rf24(rf24_gpio_pin_t ce, rf24_gpio_pin_t csn);
 DLL void rf24_delete(RF24Handle rf_handle);
 DLL void rf24_begin(RF24Handle rf_handle);
 DLL void rf24_startListening(RF24Handle rf_handle);
