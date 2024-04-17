@@ -101,23 +101,23 @@ int main(int argc, char** argv)
 
 void set_role()
 {
-    char input = 0;
-    while (input == 0) {
-      printf("*** PRESS 'T' to begin transmitting to the other node\n");
-      printf("*** PRESS 'R' to begin receiving from the other node\n");
-      printf("*** PRESS 'Q' to exit\n");
-      scanf("%c", input);
-      if (input >= 1) {
-	if (input == 'T' || input == 't')
+    int input = -1;
+    while (input == -1) {
+      printf("*** PRESS '1' to begin transmitting to the other node\n");
+      printf("*** PRESS '2' to begin receiving from the other node\n");
+      printf("*** PRESS '0' to exit\n");
+      scanf("%d", &input);
+      if (input >= 0) {
+	if (input == 1)
 	  master();
-	else if (input == 'R' || input == 'r')
+	else if (input == 2)
 	  slave();
-	else if (input == 'Q' || input == 'q')
+	else if (input == 0)
 	  break;
 	else
-	  printf("%c is an invalid input. Please try again.\n", input);
+	  printf("%d is an invalid input. Please try again.\n", input);
       }
-      input = 0; // stay in the while loop
+      input = -1; // stay in the while loop
     }               // while
 } // setRole()
 
