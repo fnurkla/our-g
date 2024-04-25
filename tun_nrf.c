@@ -13,6 +13,7 @@
 #define CE_PIN 17
 #define CHANNEL 111
 
+#define VIRTUAL_INTERFACE "tun0"
 #define BUFLEN 576
 #define MAX_RETRY 5
 
@@ -91,7 +92,7 @@ int main(int argc, char** argv) {
 	struct ifreq ifr;
 	memset(&ifr, 0, sizeof(ifr));
 	ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
-	strncpy(ifr.ifr_name, "tun0", IFNAMSIZ);
+	strncpy(ifr.ifr_name, VIRTUAL_INTERFACE, IFNAMSIZ);
 	int res = ioctl(tun_fd, TUNSETIFF, &ifr);
 	if (res == -1) {
 		printf("ioctl failed");
