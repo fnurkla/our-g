@@ -103,6 +103,7 @@ int main(int argc, char** argv) {
 		while (1) {
 			size_t size = listen_and_defragment(buf);
 			if (size > 0) {
+				printf("received %ld bytes\n", size);
 				write(tun_fd, buf, size);
 			}
 		}
@@ -114,7 +115,17 @@ int main(int argc, char** argv) {
 				printf("read error");
 				return 1;
 			}
+			printf("sending:\n");
+			for (int i = 0; i < count; i++) {
+				printf("%x ", buf[i]);
+				if (i % 16 == 0) {
+					printf("\n");
+				} else if (i % 8 == 0){
+					printf(" ");
+				}
+			}
 			fragment_and_send(buf, count);
+			printf("done");
 		}
 	}
 }
