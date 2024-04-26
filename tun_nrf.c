@@ -153,6 +153,7 @@ int main() {
 	pthread_t sender, receiver;
 
 	res = pthread_create(&sender, NULL, do_send, &tun_fd);
+	sleep(1); // prevent race condition
 	res |= pthread_create(&receiver, NULL, do_receive, &tun_fd);
 	assert(!res);
 
