@@ -71,22 +71,26 @@ int main(int argc, char** argv) {
 
 	char role = argv[1][0];
 
+	int tun_fd;
+
 	// Init RF24
 	if (role == 'r') {
 		radio = new_rf24(RX_CE_PIN, RX_CSN_PIN);
 		rf24_begin(radio);
 		rf24_setChannel(radio, RX_CHANNEL);
+		tun_fd = open("/dev/net/tun", O_WRONLY); // The receiver writes to the interface
 	} else {
 		radio = new_rf24(TX_CE_PIN, TX_CSN_PIN);
 		rf24_begin(radio);
 		rf24_setChannel(radio, TX_CHANNEL);
+		tun_fd = open("/dev/net/tun", O_RDONLY); // The sender reads from the interface
+
 	}
 	rf24_setPALevel(radio, RF24_PA_LOW);
 	rf24_openWritingPipe(radio, address[role == 'r']);
 	rf24_openReadingPipe(radio, 1, address[!(role == 'r')]);
 
 	// Init TUN interface
-	int tun_fd = open("/dev/net/tun", O_RDWR);
 	if (tun_fd == -1) {
 		printf("Error opening /dev/net/tun");
 		return 1;
