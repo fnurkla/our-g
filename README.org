@@ -9,7 +9,9 @@
   - [X] bus 0
   - [X] bus 1
 
-** TODO Make a decision about what libraries to use
+** DONE TODO Make a decision about what libraries to use
+CLOSED: [2024-04-26 Fri 15:17]
+We are using the C++ driver in a C wrapped cribbed from the Go "library".
 
 *** DONE Try the Go library again.
 CLOSED: [2024-03-26 Tue 14:31]
@@ -30,6 +32,7 @@ the provided =install.sh=.  This puts them in =/usr/local/{include|lib}=.
 The c-wrapper files are placed in the same directories.
 
 *** TODO Redo build system
+This is on the way, but not optimal.
 
 *** DONE Check radio frequencies
 CLOSED: [2024-04-17 Wed 16:01]
@@ -40,9 +43,23 @@ CLOSED: [2024-04-17 Wed 16:02]
 We can now change it easily.  This turned out to not be the problem, so we stay
 at low power; for testing at least.
 
-*** TODO Research NAT and routing
+*** DONE TODO Research NAT and routing
+CLOSED: [2024-04-26 Fri 10:11]
+This is done through =iptables=.
 
 *** TODO Research control plane
+
+*** NICE-TO-HAVE Change =iptables= to =nftables=
+
+*** TODO Remove busy waits
+Right now OurG is a resource hog (both threads).
+
+*** TODO Evaluate perf
+
+*** TODO Investigate package loss
+Right now we are consistently losing 2 packets each run of =ping=.
+
+*** NICE-TO-HAVE Move setup config to system config
 
 * Diary
 
@@ -114,3 +131,10 @@ On the mobile unit
 #+begin_src bash
 ./mobile_unit
 #+end_src
+
+** 2024-04-26
+Today we acieved the IP over OurG part of the basic requirements.  This entailed
+first getting one way communication to work, with a sender on one side and a
+reciever on the other side.  Then we reworked the application to multithreaded
+to allow sending and recieving on both sides.  Finally, we installed =iptables= on
+the base station to get NAT to work.
