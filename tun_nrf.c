@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <fcntl.h> // open()
 #include <linux/if_tun.h> // IFF_TUN, IFF_NO_PI
 #include <net/if.h> // ifreq
@@ -92,7 +93,11 @@ int main(int argc, char** argv) {
 
 	// Init TUN interface
 	if (tun_fd == -1) {
-		printf("Error opening /dev/net/tun");
+		#ifdef _GNU_SOURCE
+		printf("Error opening /dev/net/tun: %s\n", strerrorname_np(errno));
+		#else
+		printf("Error opening /dev/net/tun: %s\n", strerror(errno));
+		#endif
 		return 1;
 	}
 	struct ifreq ifr;
