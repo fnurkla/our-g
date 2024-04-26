@@ -71,15 +71,15 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	int role = strncmp(argv[1], "r", 1) == 0; // 0: sender, 0: receiver
+	char role = argv[1][0];
 
 	// Init RF24
 	radio = new_rf24(CE_PIN, CSN_PIN);
 	rf24_begin(radio);
 	rf24_setChannel(radio, CHANNEL);
 	rf24_setPALevel(radio, RF24_PA_LOW);
-	rf24_openWritingPipe(radio, address[role]);
-	rf24_openReadingPipe(radio, 1, address[!role]);
+	rf24_openWritingPipe(radio, address[role == 'r']);
+	rf24_openReadingPipe(radio, 1, address[!(role == 'r')]);
 
 	// Init TUN interface
 	int tun_fd = open("/dev/net/tun", O_RDWR);
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 	printf("opened tun interface: %d\n", tun_fd);
 
 	char buf[BUFLEN];
-	if (role == 0) {
+	if (role == 'r') {
 		rf24_startListening(radio);
 		while (1) {
 			size_t size = listen_and_defragment(buf);
