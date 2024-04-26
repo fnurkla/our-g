@@ -106,7 +106,11 @@ int main(int argc, char** argv) {
 	strncpy(ifr.ifr_name, VIRTUAL_INTERFACE, IFNAMSIZ);
 	int res = ioctl(tun_fd, TUNSETIFF, &ifr);
 	if (res == -1) {
-		printf("ioctl failed");
+		#ifdef _GNU_SOURCE
+		printf("ioctl failed: %s\n", strerrorname_np(errno));
+		#else
+		printf("ioctl failed: %s\n", strerror(errno));
+		#endif
 		return 1;
 	}
 
