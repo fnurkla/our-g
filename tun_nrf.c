@@ -9,9 +9,7 @@
 #include <sys/types.h> // ssize_t
 #include <unistd.h> // read()
 
-#define CSN_PIN 0
-#define CE_PIN 17
-#define CHANNEL 111
+#include <opts.h>
 
 #define VIRTUAL_INTERFACE "tun0"
 #define BUFLEN 65535
@@ -74,9 +72,15 @@ int main(int argc, char** argv) {
 	char role = argv[1][0];
 
 	// Init RF24
-	radio = new_rf24(CE_PIN, CSN_PIN);
-	rf24_begin(radio);
-	rf24_setChannel(radio, CHANNEL);
+	if (role == 'r') {
+		radio = new_rf24(RX_CE_PIN, RX_CSN_PIN);
+		rf24_begin(radio);
+		rf24_setChannel(radio, RX_CHANNEL);
+	} else {
+		radio = new_rf24(TX_CE_PIN, TX_CSN_PIN);
+		rf24_begin(radio);
+		rf24_setChannel(radio, TX_CHANNEL);
+	}
 	rf24_setPALevel(radio, RF24_PA_LOW);
 	rf24_openWritingPipe(radio, address[role == 'r']);
 	rf24_openReadingPipe(radio, 1, address[!(role == 'r')]);
