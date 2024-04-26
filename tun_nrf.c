@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 			}
 			printf("sending:\n");
 			for (int i = 0; i < count; i++) {
-				printf("%x ", buf[i]);
+				printf("%02x ", buf[i]);
 				if (i % 16 == 0) {
 					printf("\n");
 				} else if (i % 8 == 0){
