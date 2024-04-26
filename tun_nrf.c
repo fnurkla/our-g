@@ -14,7 +14,7 @@
 #define CHANNEL 111
 
 #define VIRTUAL_INTERFACE "tun0"
-#define BUFLEN 576
+#define BUFLEN 65535
 #define MAX_RETRY 5
 
 RF24Handle radio;
@@ -34,18 +34,16 @@ size_t listen_and_defragment(char* buffer) {
 
 	int i;
 	for (i = bytes; i < total_length; i += 32) {
-		if (rf24_available(radio)) {
-			bytes = rf24_getPayloadSize(radio);
-			if (i + bytes > BUFLEN) {
-				printf("Buffer full");
-				return i;
-			}
-			rf24_read(radio, &buffer[i], bytes);
-		} else {
-			printf("Fragment lost? or next fragment not arrived yet?");
+		while (!rf24_available(radio)) {
+			sleep(1);
 		}
 
-		// Maybe sleep to make sure next fragment has arrived
+		bytes = rf24_getPayloadSize(radio);
+		if (i + bytes > BUFLEN) {
+			printf("Buffer full");
+			return i;
+		}
+		rf24_read(radio, &buffer[i], bytes);
 	}
 	return total_length;
 }
