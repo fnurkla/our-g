@@ -97,6 +97,8 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+	printf("opened tun interface: %d\n", tun_fd);
+
 	char buf[BUFLEN];
 	if (role == 0) {
 		rf24_startListening(radio);
