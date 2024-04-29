@@ -1,3 +1,4 @@
+#include "rf24c/rf24c.h"
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h> // open()
@@ -74,6 +75,7 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 			return;
 		}
 	}
+	rf24_txStandBy(radio);
 }
 
 void *do_receive(void *argument) {
