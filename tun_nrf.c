@@ -67,7 +67,7 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 		int tries = 0;
 		while (!success && tries < MAX_RETRY) {
 			tries++;
-			success = rf24_write(radio, bytes, cur_size);
+			success = rf24_writeFast(radio, bytes, cur_size);
 		}
 		if (tries == MAX_RETRY) {
 			printf("Max retries reached");

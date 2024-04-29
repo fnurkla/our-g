@@ -41,6 +41,7 @@ DLL void rf24_startListening(RF24Handle rf_handle);
 DLL void rf24_stopListening(RF24Handle rf_handle);
 DLL cbool rf24_write(RF24Handle rf_handle, const void* source, uint8_t len);
 DLL void rf24_startWrite(RF24Handle rf_handle, const void* source, uint8_t len, const bool multicast);
+DLL cbool rf24_writeFast(RF24Handle rf_handle, const void* source, uint8_t len);
 DLL void rf24_writeAckPayload(RF24Handle, uint8_t pipe, const void* source, uint8_t len);
 DLL cbool rf24_available(RF24Handle rf_handle);
 DLL cbool rf24_available_pipe(RF24Handle rf_handle, uint8_t* out_pipe);

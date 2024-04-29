@@ -49,6 +49,11 @@ void rf24_startWrite(RF24Handle rf_handle, const void* source, uint8_t len, cons
   r->startWrite(source, len, multicast);
 }
 
+cbool rf24_writeFast(RF24Handle rf_handle, const void* source, uint8_t len) {
+  RF24* r = to_rf(rf_handle);
+  return cbool(r->writeFast(source, len));
+}
+
 void rf24_writeAckPayload(RF24Handle rf_handle, uint8_t pipe, const void* source, uint8_t len) {
   RF24* r = to_rf(rf_handle);
   r->writeAckPayload(pipe, source, len);
