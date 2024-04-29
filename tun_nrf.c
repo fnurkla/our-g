@@ -11,6 +11,7 @@
 #include <string.h> // memset()
 #include <sys/ioctl.h> // ioctl()
 #include <sys/types.h> // ssize_t
+#include <time.h>
 #include <unistd.h> // read()
 
 #include <opts.h>
@@ -18,6 +19,8 @@
 #define VIRTUAL_INTERFACE "tun0"
 #define BUFLEN 65535
 #define MAX_RETRY 5
+
+struct timespec delay = {0, 50000}; // 50 µs
 
 
 RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
@@ -47,7 +50,7 @@ size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 	int i;
 	for (i = bytes; i < total_length; i += 32) {
 		while (!rf24_available(radio)) {
-			sleep(1);
+			nanosleep(&delay, NULL);
 		}
 
 		bytes = rf24_getPayloadSize(radio);
