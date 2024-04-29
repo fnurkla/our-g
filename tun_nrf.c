@@ -16,6 +16,22 @@
 
 #include <opts.h>
 
+#define PRINT		0	/* enable/disable prints. */
+
+/* the funny do-while next clearly performs one iteration of the loop.
+ * if you are really curious about why there is a loop, please check
+ * the course book about the C preprocessor where it is explained. it
+ * is to avoid bugs and/or syntax errors in case you use the pr in an
+ * if-statement without { }.
+ *
+ */
+
+#if PRINT
+#define pr(...)		do { fprintf(stderr, __VA_ARGS__); } while (0)
+#else
+#define pr(...)		/* no effect at all */
+#endif
+
 #define VIRTUAL_INTERFACE "tun0"
 #define BUFLEN 65535
 #define MAX_RETRY 5
@@ -55,7 +71,7 @@ size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 
 		bytes = rf24_getPayloadSize(radio);
 		if (i + bytes > BUFLEN) {
-			printf("Buffer full");
+			pr("Buffer full");
 			return i;
 		}
 		rf24_read(radio, &buffer[i], bytes);
@@ -74,7 +90,7 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 			success = rf24_writeFast(radio, bytes, cur_size);
 		}
 		if (tries == MAX_RETRY) {
-			printf("Max retries reached");
+			pr("Max retries reached");
 			return;
 		}
 	}
@@ -92,7 +108,7 @@ void *do_receive(void *argument) {
 	while (1) {
 		size_t size = listen_and_defragment(radio, buf);
 		if (size > 0) {
-			printf("received %ld bytes\n", size);
+			pr("received %ld bytes\n", size);
 			write(tun_fd, buf, size);
 		}
 	}
@@ -108,20 +124,20 @@ void *do_send(void *argument) {
 	while (1) {
 		ssize_t count = read(tun_fd, buf, BUFLEN);
 		if (count < 0) {
-			printf("read error\n");
+			pr("read error\n");
 			return NULL;
 		}
-		printf("sending:\n");
+		pr("sending:\n");
 		for (int i = 0; i < count; i++) {
-			printf("%02x ", buf[i]);
+			pr("%02x ", buf[i]);
 			if (i % 16 == 0) {
-				printf("\n");
+				pr("\n");
 			} else if (i % 8 == 0){
-				printf(" ");
+				pr(" ");
 			}
 		}
 		fragment_and_send(radio, buf, count);
-		printf("done\n");
+		pr("done\n");
 	}
 }
 
@@ -133,9 +149,9 @@ int main() {
 	// Init TUN interface
 	if (tun_fd == -1) {
 		#ifdef _GNU_SOURCE
-		printf("Error opening /dev/net/tun: %s\n", strerrorname_np(errno));
+		pr("Error opening /dev/net/tun: %s\n", strerrorname_np(errno));
 		#else
-		printf("Error opening /dev/net/tun: %s\n", strerror(errno));
+		pr("Error opening /dev/net/tun: %s\n", strerror(errno));
 		#endif
 		return 1;
 	}
@@ -146,14 +162,14 @@ int main() {
 	int res = ioctl(tun_fd, TUNSETIFF, &ifr);
 	if (res == -1) {
 		#ifdef _GNU_SOURCE
-		printf("ioctl failed: %s\n", strerrorname_np(errno));
+		pr("ioctl failed: %s\n", strerrorname_np(errno));
 		#else
-		printf("ioctl failed: %s\n", strerror(errno));
+		pr("ioctl failed: %s\n", strerror(errno));
 		#endif
 		return 1;
 	}
 
-	printf("opened tun interface: %d\n", tun_fd);
+	pr("opened tun interface: %d\n", tun_fd);
 
 	pthread_t sender, receiver;
 
