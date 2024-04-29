@@ -54,10 +54,19 @@ This is done through =iptables=.
 *** TODO Remove busy waits
 Right now OurG is a resource hog (both threads).
 
-*** TODO Evaluate perf
+**** IRQ? Ask William
 
-*** TODO Investigate package loss
+*** TODO Evaluate perf
+We have an idea about what methods to use to approximate this now.  ~iperf3~ works
+fine, if you know how to interpret the output.  ~ping~ is fine, but ping something
+on LTH campus that is not the pi itself.
+
+*** DONE TODO Investigate package loss
+CLOSED: [2024-04-29 Mon 16:44]
 Right now we are consistently losing 2 packets each run of =ping=.
+
+Update: This was us being stupid, the packets were lost because we killed ~ping~
+before the packets had returned.
 
 *** NICE-TO-HAVE Move setup config to system config
 
@@ -138,3 +147,18 @@ first getting one way communication to work, with a sender on one side and a
 reciever on the other side.  Then we reworked the application to multithreaded
 to allow sending and recieving on both sides.  Finally, we installed =iptables= on
 the base station to get NAT to work.
+
+** 2024-04-29
+Today we spent our time testing and tweaking the performance of our system.  The
+first thing we did was switching from ~write~ to ~writeFast~, but since we hadn't
+started testing the performance yet, we don't know if it improved anything.
+
+Then we minimized the delay between reads of the link (1s -> 50µs).  This was
+huge for the latency, as it reduced it from 2 seconds to ~4ms.  No shit.
+
+After that we evaluated the throughput by use of ~iperf3~.  We approximate our
+throughput to about 175kb/s at the moment.
+
+We still have problems with busy waiting making the whole thing a resource hog,
+so we will ask William about that on thursday.  Could we perhaps use the IRQ
+pin?
