@@ -1,4 +1,3 @@
-#include "rf24c/rf24c.h"
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h> // open()
