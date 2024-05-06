@@ -57,10 +57,10 @@ RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
 }
 
 int is_dataplane(char* buffer) {
-	return 0b10000000 & buffer[0] != 0;
+	return (0b10000000 & buffer[0]) != 0;
 }
 
-enum contol_msg ctrl_msg(char* buffer) {
+enum control_msg ctrl_msg(char* buffer) {
 	return (0b01100000 & buffer[0]) >> 5;
 }
 
@@ -78,7 +78,7 @@ int do_handshake(RF24Handle radio, char* base_station_name) {
 
 	do {
 		success = rf24_write(radio, buffer, 32);
-	} while (!success)
+	} while (!success);
 
 	rf24_startListening(radio);
 
