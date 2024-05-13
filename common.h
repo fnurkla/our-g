@@ -6,3 +6,5 @@
 
 #define TX_CE_PIN 27
 #define TX_CSN_PIN 10
+
+#define IRQ_PIN 5

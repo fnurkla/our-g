@@ -3,6 +3,7 @@
 #include <fcntl.h> // open()
 #include <linux/if_tun.h> // IFF_TUN, IFF_NO_PI
 #include <net/if.h> // ifreq
+#include <pigpio.h>
 #include <pthread.h>
 #include <rf24c.h> // rf24 stuff
 #include <stdint.h> // uint8_t
@@ -35,12 +36,24 @@
 #define BUFLEN 65535
 #define MAX_RETRY 5
 
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+unsigned int interrupt = 0;
+
 struct timespec delay = {0, 50000}; // 50 µs
 
 enum control_msg {
 	JOIN_REQUEST = 0,
 	JOIN_RESPONSE,
 	GOODBYE,
+};
+
+struct cb_args {
+	RF24Handle *radio;
+	char *buf;
+	int total_length;
+	int current_length;
+	int tun_fd;
 };
 
 
@@ -102,34 +115,6 @@ int do_handshake(RF24Handle radio, char* base_station_name) {
 	return 0;
 }
 
-size_t listen_and_defragment(RF24Handle radio, char* buffer) {
-	uint8_t bytes;
-	int total_length;
-	if (rf24_available(radio)) {
-		bytes = rf24_getPayloadSize(radio);
-		rf24_read(radio, buffer, bytes);
-
-		total_length = (buffer[2] << 8) + buffer[3];
-	} else {
-		return 0;
-	}
-
-	int i;
-	for (i = bytes; i < total_length; i += 32) {
-		while (!rf24_available(radio)) {
-			nanosleep(&delay, NULL);
-		}
-
-		bytes = rf24_getPayloadSize(radio);
-		if (i + bytes > BUFLEN) {
-			pr("Buffer full");
-			return i;
-		}
-		rf24_read(radio, &buffer[i], bytes);
-	}
-	return total_length;
-}
-
 void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 	for (int i = 0; i < size; i += 32) {
 		char* bytes = &payload[i];
@@ -148,20 +133,77 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 	rf24_txStandBy(radio);
 }
 
+void interrupt_handler(int gpio, int level, uint32_t tick) {
+	pthread_mutex_lock(&mutex);
+	interrupt++;
+	pthread_cond_signal(&cond);
+	pthread_mutex_unlock(&mutex);
+}
+
+void interrupt_callback(struct cb_args *args) {
+	RF24Handle *radio = args->radio;
+	char *buf = args->buf;
+
+	cbool tx_ok, tx_fail, rx_ready;
+	rf24_whatHappened(*radio, &tx_ok, &tx_fail, &rx_ready);
+	if (rx_ready) {
+		uint8_t bytes = rf24_getPayloadSize(radio);
+		rf24_read(radio, buf + args->current_length, bytes);
+		args->current_length += bytes;
+
+		if (args->total_length == -1) {
+			// First frame of a new IP packet, get total_length from IP header
+			args->total_length = (buf[2] << 8) + buf[3];
+		}
+
+		if (args->current_length >= args->total_length) {
+			// Full IP packet received, write to tun interface and reset buffer
+			pr("received %ld bytes\n", args->total_length);
+			write(args->tun_fd, buf, args->total_length);
+
+			memset(buf, 0, BUFLEN); // Is this needed? Buf gets overwritten anyway and we keep track of which bytes are "valid"
+			args->current_length = 0;
+			args->total_length = -1;
+		}
+	}
+}
+
 void *do_receive(void *argument) {
 	int tun_fd = *((int *) argument);
 
 	RF24Handle radio = make_radio(RX_CE_PIN, RX_CSN_PIN, RX_CHANNEL, 1);
 	char buf[BUFLEN];
 
+	// Only listen for `rx_ready` interrupts
+	rf24_maskIRQ(radio, 1, 1, 0);
+
+	struct cb_args args;
+	args.radio = &radio;
+	args.buf = buf;
+	args.total_length = -1;
+	args.current_length = 0;
+	args.tun_fd = tun_fd;
+
+	gpioSetISRFunc(IRQ_PIN, FALLING_EDGE, 0, interrupt_handler);
+
 	rf24_startListening(radio);
 
 	while (1) {
-		size_t size = listen_and_defragment(radio, buf);
-		if (size > 0) {
-			pr("received %ld bytes\n", size);
-			write(tun_fd, buf, size);
+		/*
+		   Wait for interrupts...
+		   Put thread in sleeping state somehow?
+		   wait/notify?
+		 */
+		pthread_mutex_lock(&mutex);
+		while (interrupt == 0) {
+			pthread_cond_wait(&cond, &mutex);
 		}
+		// Maybe handle case when more than one interrupt has occured since last time?
+		interrupt = 0;
+		pthread_mutex_unlock(&mutex);
+
+		// Do the things
+		interrupt_callback(&args);
 	}
 }
 
@@ -222,6 +264,11 @@ int main() {
 
 	pr("opened tun interface: %d\n", tun_fd);
 
+	if (gpioInitialise() < 0) {
+		pr("GPIO Init failed\n");
+		return 1;
+	}
+
 	pthread_t sender, receiver;
 
 	res = pthread_create(&sender, NULL, do_send, &tun_fd);
@@ -232,6 +279,8 @@ int main() {
 	res = pthread_join(sender, NULL);
 	res |= pthread_join(receiver, NULL);
 	assert(!res);
+
+	gpioTerminate();
 
 	return 0;
 }

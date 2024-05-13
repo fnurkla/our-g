@@ -201,6 +201,11 @@ void rf24_powerUp(RF24Handle rf_handle) {
   r->powerUp();
 }
 
+void rf24_maskIRQ(RF24Handle rf_handle, cbool tx_ok, cbool tx_fail, cbool rx_ready) {
+  RF24* r = to_rf(rf_handle);
+  r->maskIRQ(tx_ok, tx_fail, rx_ready);
+}
+
 void rf24_whatHappened(RF24Handle rf_handle, cbool* out_tx_ok, cbool* out_tx_fail, cbool* out_rx_ready) {
   bool tx_ok, tx_fail, rx_ready;
   RF24* r = to_rf(rf_handle);

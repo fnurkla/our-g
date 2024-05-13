@@ -72,6 +72,7 @@ DLL void rf24_printPrettyDetails(RF24Handle rf_handle);
 // TODO: string rf24_getDetails()?
 DLL void rf24_powerDown(RF24Handle rf_handle);
 DLL void rf24_powerUp(RF24Handle rf_handle);
+DLL void rf24_maskIRQ(RF24Handle rf_handle, cbool tx_ok, cbool tx_fail, cbool rx_ready);
 DLL void rf24_whatHappened(RF24Handle rf_handle, cbool* out_tx_ok, cbool* out_tx_fail, cbool* out_rx_ready);
 DLL cbool rf24_testCarrier(RF24Handle rf_handle);
 DLL cbool rf24_testRPD(RF24Handle rf_handle);
