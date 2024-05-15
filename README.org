@@ -162,3 +162,8 @@ throughput to about 175kb/s at the moment.
 We still have problems with busy waiting making the whole thing a resource hog,
 so we will ask William about that on thursday.  Could we perhaps use the IRQ
 pin?
+
+** 2024-05-15
+The IRQ pins are now plugged in.  We have switched to WiringPi for interupts,
+which seems promising but does not work yet.  Does the nRF24 even give us
+interupts?  Maybe oscilloscope to find out?
