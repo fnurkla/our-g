@@ -167,3 +167,14 @@ pin?
 The IRQ pins are now plugged in.  We have switched to WiringPi for interupts,
 which seems promising but does not work yet.  Does the nRF24 even give us
 interupts?  Maybe oscilloscope to find out?
+
+** 2024-05-17
+Today we gave up on interrupts.  Back to polling.
+
+We installed a desktop environment on the inuti40, which is now the designated
+mobile unit.  Then we installed a minecraft launcher on it, since we want that
+to be our demonstrative application.
+
+Then, the trouble began.  Ping has been working fine all along, but TCP has not
+played nice so far.  And we still don't know why.  Is our lack of control plane
+too fragile?  We'll have to look at that.
