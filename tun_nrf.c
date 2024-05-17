@@ -37,12 +37,6 @@
 
 struct timespec delay = {0, 50000}; // 50 µs
 
-enum control_msg {
-	JOIN_REQUEST = 0,
-	JOIN_RESPONSE,
-	GOODBYE,
-};
-
 
 RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
 	uint8_t address[2][2] = {"1", "2"};
@@ -54,52 +48,6 @@ RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
 	rf24_openReadingPipe(radio, 1, address[!is_receiver]);
 
 	return radio;
-}
-
-int is_dataplane(char* buffer) {
-	return (0b10000000 & buffer[0]) != 0;
-}
-
-enum control_msg ctrl_msg(char* buffer) {
-	return (0b01100000 & buffer[0]) >> 5;
-}
-
-void create_join_request(char* buffer) {
-	memset(buffer, 0, 32);
-	buffer[0] |= JOIN_REQUEST << 5;
-}
-
-int do_handshake(RF24Handle radio, char* base_station_name) {
-	char buffer[32];
-	create_join_request(buffer);
-	int success;
-
-	rf24_stopListening(radio);
-
-	do {
-		success = rf24_write(radio, buffer, 32);
-	} while (!success);
-
-	rf24_startListening(radio);
-
-	int i = 0;
-	for (; i < 20000; nanosleep(&delay, NULL), ++i) {
-		if (!rf24_available(radio))
-			continue;
-
-		uint8_t bytes = rf24_getPayloadSize(radio);
-		rf24_read(radio, buffer, bytes);
-
-		if (!is_dataplane(buffer) && ctrl_msg(buffer) == JOIN_RESPONSE)
-			break;
-	}
-	if (i == 20000) {
-		return 1;
-	}
-
-	strncpy(base_station_name, buffer + 1, 31);
-
-	return 0;
 }
 
 size_t listen_and_defragment(RF24Handle radio, char* buffer) {
@@ -141,7 +89,7 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 			success = rf24_writeFast(radio, bytes, cur_size);
 		}
 		if (tries == MAX_RETRY) {
-			pr("Max retries reached\n");
+			pr("Max retries reached");
 			return;
 		}
 	}
