@@ -44,6 +44,7 @@ RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
 	rf24_begin(radio);
 	rf24_setChannel(radio, channel);
 	rf24_setPALevel(radio, RF24_PA_LOW);
+	rf24_setDataRate(radio, 1);
 	rf24_openWritingPipe(radio, address[is_receiver]);
 	rf24_openReadingPipe(radio, 1, address[!is_receiver]);
 
@@ -86,14 +87,13 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 		int tries = 0;
 		while (!success && tries < MAX_RETRY) {
 			tries++;
-			success = rf24_writeFast(radio, bytes, cur_size);
+			success = rf24_write(radio, bytes, cur_size);
 		}
 		if (tries == MAX_RETRY) {
 			pr("Max retries reached");
 			return;
 		}
 	}
-	rf24_txStandBy(radio);
 }
 
 void *do_receive(void *argument) {
