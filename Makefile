@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -g -lrf24c -lpigpio
+CFLAGS = -Wall -Wextra -g -lrf24c
 
 all: base_station mobile_unit
 
