@@ -58,6 +58,10 @@ size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 		bytes = rf24_getPayloadSize(radio);
 		rf24_read(radio, buffer, bytes);
 
+		if (buffer[0] != 4) {
+			pr("Not beginning of ipv4 packet, discarding.\n");
+			return 0;
+		}
 		total_length = (buffer[2] << 8) + buffer[3];
 	} else {
 		return 0;
