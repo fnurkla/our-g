@@ -37,6 +37,7 @@
 #define MTU 1500
 
 struct timespec delay = {0, 50000}; // 50 µs
+struct timespec send_delay = {0, 500000}; // 500 µs
 
 
 RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
@@ -124,7 +125,7 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 			pr("Max retries reached\n");
 			return;
 		}
-		nanosleep(&delay, NULL);
+		nanosleep(&send_delay, NULL);
 	}
 }
 
