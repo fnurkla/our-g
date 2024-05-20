@@ -52,6 +52,32 @@ RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
 	return radio;
 }
 
+int is_good_ip_header(char *buf) {
+	// Ip version
+	if ((buf[0] & 0b11110000) != (4 << 4)) {
+		pr("Not beginning of ipv4 packet.\n");
+		return 0;
+	}
+	// Header length
+	if ((buf[0] & 0b00001111) < 5) {
+		pr("Header too short\n");
+		return 0;
+	}
+	// Differentiated services
+	uint8_t ds = (buf[1] & 0b11111100) >> 2;
+	if (ds != 18 || ds != 0) {
+		pr("Wrong DSCP\n");
+		return 0;
+	}
+	// Evil bit
+	if (((buf[6] & 0b11100000) >> 5) != 0) {
+		pr("Packet is evil\n");
+		return 0;
+	}
+	// Good packet :^)
+	return 1;
+}
+
 size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 	uint8_t bytes;
 	int total_length;
@@ -59,8 +85,8 @@ size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 		bytes = rf24_getPayloadSize(radio);
 		rf24_read(radio, buffer, bytes);
 
-		if ((buffer[0] & 0b11110000) != (4 << 4)) {
-			pr("Not beginning of ipv4 packet, discarding.\n");
+		if (!is_good_ip_header(buffer)) {
+			pr("Discarding.\n");
 			return 0;
 		}
 		total_length = (buffer[2] << 8) + buffer[3];
