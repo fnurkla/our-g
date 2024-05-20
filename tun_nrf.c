@@ -97,6 +97,7 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 			pr("Max retries reached");
 			return;
 		}
+		nanosleep(&delay, NULL);
 	}
 }
 
