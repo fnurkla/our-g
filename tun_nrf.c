@@ -70,7 +70,7 @@ int is_good_ip_header(char *buf) {
 		return 0;
 	}
 	// Evil bit
-	if (((buf[6] & 0b11100000) >> 5) != 0) {
+	if (((buf[6] & 0b10000000) >> 7) != 0) {
 		pr("Packet is evil\n");
 		return 0;
 	}
