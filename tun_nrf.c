@@ -65,7 +65,7 @@ int is_good_ip_header(char *buf) {
 	}
 	// Differentiated services
 	uint8_t ds = (buf[1] & 0b11111100) >> 2;
-	if (ds != 0x18 || ds != 0x0) {
+	if (ds != 0x18 && ds != 0x0) {
 		pr("Wrong DSCP, got %d\n", ds);
 		return 0;
 	}
