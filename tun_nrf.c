@@ -34,6 +34,7 @@
 #define VIRTUAL_INTERFACE "tun0"
 #define BUFLEN 65535
 #define MAX_RETRY 5
+#define MTU 1500
 
 struct timespec delay = {0, 50000}; // 50 µs
 
@@ -63,6 +64,10 @@ size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 			return 0;
 		}
 		total_length = (buffer[2] << 8) + buffer[3];
+		if (total_length > MTU) {
+			pr("Incoming package (%d) longer than %d bytes, discarding.\n", total_length, MTU);
+			return 0;
+		}
 		pr("Expecting packet of length %d\n", total_length);
 	} else {
 		return 0;
