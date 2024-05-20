@@ -133,15 +133,7 @@ void *do_send(void *argument) {
 			pr("read error\n");
 			return NULL;
 		}
-		pr("sending:\n");
-		for (int i = 0; i < count; i++) {
-			pr("%02x ", buf[i]);
-			if (i % 16 == 0) {
-				pr("\n");
-			} else if (i % 8 == 0){
-				pr(" ");
-			}
-		}
+		pr("sending packet of length %ld... ", count);
 		fragment_and_send(radio, buf, count);
 		pr("done\n");
 	}
