@@ -63,12 +63,6 @@ int is_good_ip_header(char *buf) {
 		pr("Header too short\n");
 		return 0;
 	}
-	// Differentiated services
-	uint8_t ds = (buf[1] & 0b11111100) >> 2;
-	if (ds != 0x18 && ds != 0x0) {
-		pr("Wrong DSCP, got %d\n", ds);
-		return 0;
-	}
 	// Evil bit
 	if (((buf[6] & 0b10000000) >> 7) != 0) {
 		pr("Packet is evil\n");
