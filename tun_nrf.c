@@ -63,12 +63,13 @@ size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 			return 0;
 		}
 		total_length = (buffer[2] << 8) + buffer[3];
+		pr("Expecting packet of length %d\n", total_length);
 	} else {
 		return 0;
 	}
 
 	int i;
-	for (i = bytes; i < total_length; i += 32) {
+	for (i = bytes; i < total_length; i += bytes) {
 		while (!rf24_available(radio)) {
 			nanosleep(&delay, NULL);
 		}
@@ -79,6 +80,7 @@ size_t listen_and_defragment(RF24Handle radio, char* buffer) {
 			return i;
 		}
 		rf24_read(radio, &buffer[i], bytes);
+		pr("have received %d/%d bytes\n", i, total_length);
 	}
 	return total_length;
 }
@@ -94,7 +96,7 @@ void fragment_and_send(RF24Handle radio, char* payload, ssize_t size) {
 			success = rf24_write(radio, bytes, cur_size);
 		}
 		if (tries == MAX_RETRY) {
-			pr("Max retries reached");
+			pr("Max retries reached\n");
 			return;
 		}
 		nanosleep(&delay, NULL);
