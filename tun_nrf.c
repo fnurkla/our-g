@@ -97,7 +97,7 @@ size_t listen_and_defragment(RF24Handle radio, uint8_t* buffer) {
 			return 0;
 		}
 		memcpy(buffer + (i * DATA_SIZE), buf + 1, DATA_SIZE);
-		pr("have received %d/%d bytes\n", i, total_length);
+		pr("have received %d/%d fragments, %d/%d bytes\n", i, num_fragments, (i * DATA_SIZE), total_length);
 	}
 	return total_length;
 }
