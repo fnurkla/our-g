@@ -115,7 +115,10 @@ void fragment_and_send(RF24Handle radio, uint8_t* payload, ssize_t size) {
 	for (int i = 0; i < size; i += 32) {
 		uint8_t* bytes = payload + i;
 		size_t cur_size = size - i < 32 ? size - i : 32;
-		rf24_write(radio, bytes, cur_size);
+		int success = rf24_write(radio, bytes, cur_size);
+		if (!success) {
+			pr("Transmission failed\n");
+		}
 		nanosleep(&send_delay, NULL);
 	}
 }
