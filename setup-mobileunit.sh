@@ -15,3 +15,4 @@ ip addr add 11.11.11.2/24 dev $VIRT_INTERFACE
 ip link set dev $VIRT_INTERFACE up
 
 ip route add 8.8.8.8 dev $VIRT_INTERFACE
+ip route add 194.47.245.203 dev $VIRT_INTERFACE
