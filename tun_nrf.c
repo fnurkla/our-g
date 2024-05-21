@@ -34,6 +34,7 @@
 #define VIRTUAL_INTERFACE "tun0"
 #define BUFLEN 65535
 #define MTU 1500
+#define DATA_SIZE 31
 
 struct timespec delay = {0, 50000}; // 50 µs
 struct timespec send_delay = {0, 500000}; // 500 µs
@@ -56,35 +57,17 @@ RF24Handle make_radio(int ce_pin, int csn_pin, int channel, int is_receiver) {
 	return radio;
 }
 
-int is_good_ip_header(uint8_t *buf) {
-	// Ip version
-	if ((buf[0] & 0b11110000) != (4 << 4)) {
-		pr("Not beginning of ipv4 packet.\n");
-		return 0;
-	}
-	// Header length
-	if ((buf[0] & 0b00001111) < 5) {
-		pr("Header too short\n");
-		return 0;
-	}
-	// Evil bit
-	if (((buf[6] & 0b10000000) >> 7) != 0) {
-		pr("Packet is evil\n");
-		return 0;
-	}
-	// Good packet :^)
-	return 1;
-}
-
 size_t listen_and_defragment(RF24Handle radio, uint8_t* buffer) {
 	int total_length;
+	uint8_t buf[payload_size];
 	if (rf24_available(radio)) {
-		rf24_read(radio, buffer, payload_size);
+		rf24_read(radio, buf, payload_size);
 
-		if (!is_good_ip_header(buffer)) {
+		if (buf[0] != 0) {
 			pr("Discarding.\n");
 			return 0;
 		}
+		memcpy(buffer, buf + 1, DATA_SIZE);
 		total_length = (buffer[2] << 8) | buffer[3];
 		if (total_length > MTU) {
 			pr("Incoming package (%d) longer than %d bytes, discarding.\n", total_length, MTU);
@@ -96,26 +79,40 @@ size_t listen_and_defragment(RF24Handle radio, uint8_t* buffer) {
 	}
 
 	int i;
-	for (i = payload_size; i < total_length; i += payload_size) {
+	int num_fragments = total_length / DATA_SIZE;
+	if (total_length % num_fragments != 0) ++num_fragments;
+
+	for (i = 1; i < num_fragments; ++i) {
 		while (!rf24_available(radio)) {
 			nanosleep(&delay, NULL);
 		}
 
-		if (i + payload_size > BUFLEN) {
-			pr("Buffer full");
+		if (((i + 1) * DATA_SIZE) > BUFLEN) {
+			pr("Buffer full\n");
 			return i;
 		}
-		rf24_read(radio, buffer + i, payload_size);
+		rf24_read(radio, buf, payload_size);
+		if (buf[0] != i) {
+			pr("Not correct packet number\n");
+			return 0;
+		}
+		memcpy(buffer + (i * DATA_SIZE), buf + 1, DATA_SIZE);
 		pr("have received %d/%d bytes\n", i, total_length);
 	}
 	return total_length;
 }
 
 void fragment_and_send(RF24Handle radio, uint8_t* payload, ssize_t size) {
-	for (int i = 0; i < size; i += 32) {
-		uint8_t* bytes = payload + i;
-		size_t cur_size = size - i < 32 ? size - i : 32;
-		int success = rf24_write(radio, bytes, cur_size);
+	int num_fragments = size / DATA_SIZE;
+	if (size % num_fragments != 0) ++num_fragments;
+
+	for (int i = 0; i < num_fragments; ++i) {
+		uint8_t* data = payload + (i * DATA_SIZE);
+		size_t cur_size = size - (i * DATA_SIZE) < DATA_SIZE ? size - (i * DATA_SIZE) : DATA_SIZE;
+		uint8_t bytes[DATA_SIZE + 1];
+		bytes[0] = i;
+		memcpy(bytes + 1, data, DATA_SIZE);
+		int success = rf24_write(radio, bytes, cur_size + 1);
 		if (!success) {
 			pr("Transmission failed\n");
 		}
