@@ -80,7 +80,7 @@ size_t listen_and_defragment(RF24Handle radio, uint8_t* buffer) {
 
 	int i;
 	int num_fragments = total_length / DATA_SIZE;
-	if (total_length % num_fragments != 0) ++num_fragments;
+	if (total_length % DATA_SIZE != 0) ++num_fragments;
 
 	for (i = 1; i < num_fragments; ++i) {
 		while (!rf24_available(radio)) {
@@ -104,7 +104,7 @@ size_t listen_and_defragment(RF24Handle radio, uint8_t* buffer) {
 
 void fragment_and_send(RF24Handle radio, uint8_t* payload, ssize_t size) {
 	int num_fragments = size / DATA_SIZE;
-	if (size % num_fragments != 0) ++num_fragments;
+	if (size % DATA_SIZE != 0) ++num_fragments;
 
 	for (int i = 0; i < num_fragments; ++i) {
 		uint8_t* data = payload + (i * DATA_SIZE);
