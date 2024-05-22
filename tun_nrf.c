@@ -64,7 +64,7 @@ size_t listen_and_defragment(RF24Handle radio, uint8_t* buffer) {
 		rf24_read(radio, buf, payload_size);
 
 		if (buf[0] != 0) {
-			pr("Discarding.\n");
+			pr("Not the start of a packet. Discarding.\n");
 			return 0;
 		}
 		memcpy(buffer, buf + 1, DATA_SIZE);
